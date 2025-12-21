@@ -13,7 +13,7 @@ function MangaPage() {
   const [currentIndex,setCurrentIndex]=useState()
   useEffect(()=>
   {
-    axios.get(`https://api.mangadex.org/manga/${id}/feed?translatedLanguage[]=en&order[chapter]=desc&limit=500`)
+    axios.get(`/api/manga/${id}/feed?translatedLanguage[]=en&order[chapter]=desc&limit=500`)
     .then(res=>
     {
       console.log(res.data )
@@ -38,7 +38,7 @@ function MangaPage() {
     .catch(err=>console.error('unable to fetch manga chapters',err))
 
     // fetching chapter title
-    axios.get(`https://api.mangadex.org/manga/${id}`)
+    axios.get(`/api/manga/${id}`)
     .then(res=>
     {
       console.log("manga details",res.data);
@@ -54,7 +54,7 @@ function MangaPage() {
   useEffect(()=>
   {
     if (!chapterID) return
-    axios.get(`https://api.mangadex.org/at-home/server/${chapterID}`)
+    axios.get(`/api/at-home/server/${chapterID}`)
     .then(res=>
     {
       console.log("active chapter data",res.data)
@@ -90,7 +90,6 @@ function MangaPage() {
           <option
             key={chapter.id}
             value={chapter.id}
-            onClick={setCurrentIndex(index)}
             className="bg-gray-500 text-white"
           >
             Chapter {chapter.attributes.chapter || 'N/A'} - {chapter.attributes.title}
