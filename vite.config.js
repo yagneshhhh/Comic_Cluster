@@ -12,5 +12,13 @@ export default defineConfig({
     }),
     tailwindcss(),
   ],
-  
+  server: {
+    proxy: {
+      "/api": {
+        target: "https://api.mangadex.org",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ""),
+      },
+    },
+  },
 })

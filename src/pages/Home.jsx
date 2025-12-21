@@ -12,7 +12,7 @@ function Home() {
     setLoading(true);
 
     axios
-      .get("/api/manga")
+      .get("/api/manga?limit=80&availableTranslatedLanguage[]=en&order[rating]=desc&includes[]=cover_art")
       .then((res) => {
         const mangaData = res.data.data;
 
