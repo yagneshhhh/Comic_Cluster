@@ -68,8 +68,10 @@ npm run dev
 
 http://localhost:5173
 
+ 
+## 🎥 Project Demo
 
-
-
+▶️ Watch the demo video:  
+https://drive.google.com/file/d/FILE_ID/view?usp=sharing
 
 
