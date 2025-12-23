@@ -8,9 +8,6 @@ function MangaPage() {
   const [chapterID,setChapterID]=useState(null);// stores the selected chapterID
   const [chapterContent , setChapterContent]=useState(null);
   const [nameDetails,setNameDetails]=useState([])
-  const [next,setNext]=useState(false)
-  const [prev,setPrev]=useState(false)
-  const [currentIndex,setCurrentIndex]=useState()
   useEffect(()=>
   {
     axios.get(`/api/manga/${id}/feed?translatedLanguage[]=en&order[chapter]=desc&limit=500`)
@@ -24,15 +21,6 @@ function MangaPage() {
          setChapterID(res.data.data[0].id);//selecting latest chapter and storing its ID by default as get request is made to fetch chapters in desc order.                   
         
       }
-      if(prev && currentIndex < res.data.data.length-1)
-        {
-          setChapterID(res.data.data[currentIndex+1].id);
-
-        } 
-      if(next && currentIndex > 0)
-        {
-          setChapterID(res.data.data[currentIndex-1].id);
-        } 
     }
     )
     .catch(err=>console.error('unable to fetch manga chapters',err))
