@@ -48,6 +48,28 @@ It provides a clean, fast, and responsive reading experience powered by real-tim
 
 ---
 
-## 📂 Project Structure (Simplified)
+---
+
+## ⚙️ Installation & Setup
+
+1. **Clone the repository**
+```bash
+git clone https://github.com/your-username/ComicCluster.git
+
+
+cd ComicCluster
+
+
+npm install
+
+
+npm run dev
+
+
+http://localhost:5173
+
+
+
+
 
 
