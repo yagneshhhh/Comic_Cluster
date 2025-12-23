@@ -54,7 +54,7 @@ It provides a clean, fast, and responsive reading experience powered by real-tim
 
 1. **Clone the repository**
 ```bash
-git clone https://github.com/your-username/ComicCluster.git
+git clone https://github.com/yagneshhhh/ComicCluster.git
 
 
 cd ComicCluster
