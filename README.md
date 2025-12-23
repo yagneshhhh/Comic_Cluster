@@ -2,6 +2,7 @@
 
 **ComicCluster** is a modern web application for reading **Japanese comics (Manga)** online.  
 It provides a clean, fast, and responsive reading experience powered by real-time data from the **MangaDex API**.
+Trending comic data changes dynamically  . 
 
 ---
 
@@ -48,6 +49,11 @@ It provides a clean, fast, and responsive reading experience powered by real-tim
 
 ---
 
+## 🎥 Project Demo
+
+▶️ Watch the demo video:  
+https://drive.google.com/file/d/1bOhIqtUlUJEGNyladRN9fCPGluj_zCJK/view?usp=sharing
+
 ---
 
 ## ⚙️ Installation & Setup
@@ -70,11 +76,6 @@ http://localhost:5173
 
 ---
 
----
 
-## 🎥 Project Demo
-
-▶️ Watch the demo video:  
-https://drive.google.com/file/d/1bOhIqtUlUJEGNyladRN9fCPGluj_zCJK/view?usp=sharing
 
 
