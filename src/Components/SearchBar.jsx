@@ -1,6 +1,21 @@
 import axios from 'axios'
 import React, { useEffect ,useState} from 'react'
 import { Link } from 'react-router-dom'
+
+const getMangaTitle = (attributes) => {
+    const titles = attributes?.title || {};
+    const englishAltTitle = attributes?.altTitles?.find((title) => title.en)?.en;
+
+    return (
+        titles.en ||
+        englishAltTitle ||
+        titles["ja-ro"] ||
+        titles.ja ||
+        Object.values(titles)[0] ||
+        "No Title Available"
+    );
+};
+
 function SearchBar() {
     const [searchText,setSearchText]=useState('') // state variable for search text.
     const [suggestions,setSuggestions]=useState([])//search text suggestions.
@@ -13,25 +28,24 @@ function SearchBar() {
             if (searchText.trim().length <3)
             {
                 setSuggestions([]); 
+                setIsLoading(false);
                 return;
             }
             setIsLoading(true);
-        }
-        axios.get(`https://api.mangadex.org/manga?title=${searchText}&limit=4`)
-        .then(res=>
-            {
-            const results=res.data.data.map((manga)=>({
-                id:manga.id,
-                title:manga.attributes.title.en || 'No English Title Available'
-            }));
-            if(searchText.length>0)
-            {
+
+            axios.get(`/api/manga?title=${encodeURIComponent(searchText)}&limit=4`)
+            .then(res=>
+                {
+                const results=res.data.data.map((manga)=>({
+                    id:manga.id,
+                    title:getMangaTitle(manga.attributes)
+                }));
                 setSuggestions(results);
-                setIsLoading(false);
             }
+            )
+            .catch(err=>console.error('unable to load suggestions',err))
+            .finally(() => setIsLoading(false));
         }
-        )
-        .catch(err=>console.error('unable to load suggestions',err));
         
         const debounce=setTimeout(fetchSuggestions,400);//setting a timeout 400ms for the function i.e the function(API call) runs only after typing is stopped for 400ms.
         return ()=>clearTimeout(debounce);// cleanup of timer in case of any text is typed within the time interval given in setTimeot i.e it resets the time.

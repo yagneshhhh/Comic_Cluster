@@ -3,6 +3,30 @@ import { Link } from "react-router-dom";
 import { ShimmerThumbnail } from "react-shimmer-effects";
 import GlobalApi from "../API/GlobalApi";
 
+const getMangaTitle = (attributes) => {
+  const titles = attributes?.title || {};
+  const englishAltTitle = attributes?.altTitles?.find((title) => title.en)?.en;
+
+  return (
+    titles.en ||
+    englishAltTitle ||
+    titles["ja-ro"] ||
+    titles.ja ||
+    Object.values(titles)[0] ||
+    "Untitled"
+  );
+};
+
+const getCoverUrl = (manga) => {
+  const coverFileName = manga.relationships?.find(
+    (rel) => rel.type === "cover_art"
+  )?.attributes?.fileName;
+
+  return coverFileName
+    ? `https://uploads.mangadex.org/covers/${manga.id}/${coverFileName}.256.jpg`
+    : "";
+};
+
 function Home() {
   const [manga, setManga] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,19 +42,11 @@ function Home() {
       .then((res) => {
         const mangaData = res.data.data;
 
-        const formattedData = mangaData.map((item) => {
-          const cover = item.relationships.find(
-            (rel) => rel.type === "cover_art"
-          )?.attributes?.fileName;
-
-          return {
-            id: item.id,
-            title: item.attributes?.title?.en || "Untitled",
-            coverUrl: cover
-              ? `https://uploads.mangadex.org/covers/${item.id}/${cover}.256.jpg`
-              : "",
-          };
-        });
+        const formattedData = mangaData.map((item) => ({
+          id: item.id,
+          title: getMangaTitle(item.attributes),
+          coverUrl: getCoverUrl(item),
+        }));
 
         setManga(formattedData);
       })
@@ -72,11 +88,18 @@ function Home() {
                 className="p-2"
               >
                 <div className="flex flex-col items-center transition-transform hover:scale-105">
-                  <img
-                    src={item.coverUrl}
-                    alt={item.title}
-                    className="h-[180px] w-[130px] sm:h-[190px] sm:w-[150px] md:h-[200px] md:w-[160px] rounded-md object-cover"
-                  />
+                  {item.coverUrl ? (
+                    <img
+                      src={item.coverUrl}
+                      alt={item.title}
+                      referrerPolicy="no-referrer"
+                      className="h-[180px] w-[130px] sm:h-[190px] sm:w-[150px] md:h-[200px] md:w-[160px] rounded-md object-cover"
+                    />
+                  ) : (
+                    <div className="h-[180px] w-[130px] sm:h-[190px] sm:w-[150px] md:h-[200px] md:w-[160px] rounded-md bg-slate-800/70 flex items-center justify-center px-3 text-center text-xs text-slate-200">
+                      No cover
+                    </div>
+                  )}
                   <h2 className="text-white font-semibold mt-1.5 uppercase text-center">
                     {truncateTitle(item.title)}
                   </h2>

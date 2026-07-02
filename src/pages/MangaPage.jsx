@@ -94,6 +94,7 @@ function MangaPage() {
           key={index}
           src={`${chapterContent.baseUrl}/data/${chapterContent.chapter.hash}/${item}`}
           alt={`Page ${index + 1}`}
+          referrerPolicy="no-referrer"
           className="w-full sm:w-[90%] md:w-[70%] lg:w-[60%] object-contain rounded-md shadow-md"
           loading="lazy"
         />
