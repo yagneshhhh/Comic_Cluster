@@ -2,14 +2,35 @@ import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import axios from 'axios'
 import Header from '../Components/Header';
+
+const getMangaTitle = (attributes) => {
+  const titles = attributes?.title || {};
+  const englishAltTitle = attributes?.altTitles?.find((title) => title.en)?.en;
+
+  return (
+    titles.en ||
+    englishAltTitle ||
+    titles["ja-ro"] ||
+    titles.ja ||
+    Object.values(titles)[0] ||
+    "Loading..."
+  );
+};
+
 function MangaPage() {
   const {id}=useParams() // this tracks the manga ID from Link tag used .
   const [chapters,setChapters]=useState([]); // stores all the chapters
   const [chapterID,setChapterID]=useState(null);// stores the selected chapterID
   const [chapterContent , setChapterContent]=useState(null);
+  const [chapterError, setChapterError] = useState("");
   const [nameDetails,setNameDetails]=useState([])
   useEffect(()=>
   {
+    setChapters([]);
+    setChapterID(null);
+    setChapterContent(null);
+    setChapterError("");
+
     axios.get(`/api/manga/${id}/feed?translatedLanguage[]=en&order[chapter]=desc&limit=500`)
     .then(res=>
     {
@@ -18,7 +39,10 @@ function MangaPage() {
 
       if(res.data.data.length > 0)
       {
-         setChapterID(res.data.data[0].id);//selecting latest chapter and storing its ID by default as get request is made to fetch chapters in desc order.                   
+         const readableChapter = res.data.data.find(
+          (chapter) => chapter.attributes.pages > 0 && !chapter.attributes.externalUrl
+         );
+         setChapterID(readableChapter?.id || res.data.data[0].id);//selecting latest readable chapter by default when possible.
         
       }
     }
@@ -42,6 +66,16 @@ function MangaPage() {
   useEffect(()=>
   {
     if (!chapterID) return
+    const activeChapter = chapters.find((chapter) => chapter.id === chapterID);
+
+    setChapterContent(null);
+    setChapterError("");
+
+    if (activeChapter?.attributes?.externalUrl || activeChapter?.attributes?.pages === 0) {
+      setChapterError("This chapter is hosted outside MangaDex.");
+      return;
+    }
+
     axios.get(`/api/at-home/server/${chapterID}`)
     .then(res=>
     {
@@ -50,15 +84,18 @@ function MangaPage() {
       
     }
     )
-    .catch(err=>console.log('unable to fetch manga chapter data ', err))
-  },[chapterID])
+    .catch(err=>{
+      console.log('unable to fetch manga chapter data ', err)
+      setChapterError("This chapter could not be loaded from MangaDex.");
+    })
+  },[chapterID, chapters])
   const selectedChapterId= chapters.find(ch=>ch.id===chapterID)
  return (
   <div className="w-full min-h-screen rounded-xl bg-white/50  bg-backdrop-blur-md border-white border-3 text-white flex flex-col items-center py-6 px-3 sm:px-6 md:px-10">
     
     {/* Manga Title */}
     <h1 className="font-extrabold text-3xl sm:text-4xl md:text-5xl text-slate-50 text-shadow-2xs text-center mb-2">
-      {nameDetails?.attributes?.title?.en || 'Loading...'}
+      {getMangaTitle(nameDetails?.attributes)}
     </h1>
 
     {/* Chapter Title */}
@@ -80,7 +117,8 @@ function MangaPage() {
             value={chapter.id}
             className="bg-gray-500 text-white"
           >
-            Chapter {chapter.attributes.chapter || 'N/A'} - {chapter.attributes.title}
+            Chapter {chapter.attributes.chapter || 'N/A'} - {chapter.attributes.title || "Untitled"}
+            {chapter.attributes.externalUrl || chapter.attributes.pages === 0 ? " (external)" : ""}
           </option>
         ))}
       </select>
@@ -89,6 +127,21 @@ function MangaPage() {
 
     {/* Chapter Images */}
     <div className="w-full bg-gray-400/40 rounded-lg shadow-md shadow-zinc-700 p-3 sm:p-6 md:p-10 flex flex-col items-center gap-4">
+      {chapterError && (
+        <div className="w-full max-w-xl rounded-md bg-slate-900/70 p-4 text-center text-slate-100">
+          <p>{chapterError}</p>
+          {selectedChapterId?.attributes?.externalUrl && (
+            <a
+              href={selectedChapterId.attributes.externalUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-3 inline-block rounded-md bg-purple-700 px-4 py-2 font-semibold text-white hover:bg-purple-800"
+            >
+              Read on official source
+            </a>
+          )}
+        </div>
+      )}
       {chapterContent && chapterContent.chapter.data.map((item, index) => (
         <img
           key={index}
